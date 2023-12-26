@@ -9,21 +9,33 @@ namespace Lockw1nLabs\PayoneApiClient;
 
 final class PayoneApiClient implements PayoneApiClientInterface
 {
-    private $factory;
-
-    public function __construct()
-    {
-        $this->factory = PayoneApiClientFactory::create();
+    public function __construct(private readonly string $apiMode = 'live') {
+        $possibleApiModes = [
+            PayoneApiClientConstants::PAYONE_API_MODE_LIVE,
+            PayoneApiClientConstants::PAYONE_API_MODE_TEST,
+        ];
+        if (!in_array($this->apiMode, $possibleApiModes)) {
+            throw new \Exception('Payone API mode specified incorrectly. Possible values: "live" or "test"');
+        }
     }
 
-    public function createHostedCheckout(string $merchantId, array $data, string $apiMode = 'live'): array
+    private function getFactory(): PayoneApiClientFactory
     {
-        return $this->factory->createHostedCheckoutRequest()->createHostedCheckout($merchantId, $data);
+        return PayoneApiClientFactory::create($this->apiMode);
+    }
+
+    public function createHostedCheckout(string $merchantId, array $data): array
+    {
+        return $this->getFactory()
+            ->createHostedCheckoutRequest()
+            ->createHostedCheckout($merchantId, $data);
     }
 
     public function getHostedCheckoutStatus(string $merchantId, string $hostedCheckoutId)
     {
-        return $this->factory->createHostedCheckoutRequest()->getHostedCheckoutStatus($merchantId, $hostedCheckoutId);
+        return $this->getFactory()
+            ->createHostedCheckoutRequest()
+            ->getHostedCheckoutStatus($merchantId, $hostedCheckoutId);
     }
 
     public function createHostedTokenization()

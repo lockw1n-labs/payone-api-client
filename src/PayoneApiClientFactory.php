@@ -7,31 +7,40 @@
 
 namespace Lockw1nLabs\PayoneApiClient;
 
+use Exception;
 use Lockw1nLabs\PayoneApiClient\Request\Builder\RequestBuilder;
 use Lockw1nLabs\PayoneApiClient\Request\HostedCheckoutRequest;
 use Symfony\Component\HttpClient\HttpClient;
 
 class PayoneApiClientFactory
 {
-    private static $instance;
+    private static PayoneApiClientFactory $instance;
+
+    private PayoneApiClientConfig $config;
 
     private function __construct() {}
 
     protected function __clone() { }
 
+    /**
+     * @throws Exception
+     */
     public function __wakeup()
     {
-        throw new \Exception("Cannot unserialize a singleton.");
+        throw new Exception('Cannot unserialize a singleton.');
     }
 
-    public static function create(): self
+    public static function create(string $apiMode): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new static();
+            self::$instance->config = new PayoneApiClientConfig($apiMode);
         }
 
         return self::$instance;
     }
+
+
 
     public function createHostedCheckoutRequest()
     {
@@ -43,7 +52,7 @@ class PayoneApiClientFactory
 
     protected function createRequestBuilder()
     {
-        return new RequestBuilder();
+        return new RequestBuilder($this->config);
     }
 
     protected function createHttpClient()

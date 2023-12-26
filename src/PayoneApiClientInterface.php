@@ -9,7 +9,7 @@ namespace Lockw1nLabs\PayoneApiClient;
 
 interface PayoneApiClientInterface
 {
-    public function createHostedCheckout(string $merchantId, array $data, string $apiMode = 'test');
+    public function createHostedCheckout(string $merchantId, array $data);
 
     public function getHostedCheckoutStatus(string $merchantId, string $hostedCheckoutId);
 

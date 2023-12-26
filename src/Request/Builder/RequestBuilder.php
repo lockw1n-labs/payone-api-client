@@ -8,9 +8,13 @@
 namespace Lockw1nLabs\PayoneApiClient\Request\Builder;
 
 use ArrayObject;
+use Lockw1nLabs\PayoneApiClient\PayoneApiClientConfig;
+use Lockw1nLabs\PayoneApiClient\PayoneApiClientConstants;
 
 class RequestBuilder
 {
+    public function __construct(private readonly PayoneApiClientConfig $config) {}
+
     public function buildRequestParams(array $data)
     {
         return $this->removeRedundantParams($data);
@@ -19,8 +23,8 @@ class RequestBuilder
     public function buildRequestUrl(string $merchantId, string $endpoint, string $parameter = '')
     {
         $urlParameters = [
-            'https://payment.preprod.payone.com',
-            'v2',
+            $this->config->getApiBaseUrl(),
+            PayoneApiClientConstants::PAYONE_API_VERSION,
             $merchantId,
             $endpoint,
             $parameter
