@@ -10,7 +10,9 @@ namespace Lockw1nLabs\PayoneApiClient;
 use Exception;
 use Lockw1nLabs\PayoneApiClient\Request\Builder\RequestBuilder;
 use Lockw1nLabs\PayoneApiClient\Request\HostedCheckoutRequest;
+use Lockw1nLabs\PayoneApiClient\Request\Validator\HostedCheckoutRequestValidator;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PayoneApiClientFactory
 {
@@ -46,8 +48,14 @@ class PayoneApiClientFactory
     {
         return new HostedCheckoutRequest(
             $this->createHttpClient(),
-            $this->createRequestBuilder()
+            $this->createRequestBuilder(),
+            $this->createHostedCheckoutRequestValidator()
         );
+    }
+
+    protected function createHttpClient(): HttpClientInterface
+    {
+        return HttpClient::create();
     }
 
     protected function createRequestBuilder()
@@ -55,8 +63,8 @@ class PayoneApiClientFactory
         return new RequestBuilder($this->config);
     }
 
-    protected function createHttpClient()
+    protected function createHostedCheckoutRequestValidator()
     {
-        return HttpClient::create();
+        return new HostedCheckoutRequestValidator();
     }
 }

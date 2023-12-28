@@ -7,19 +7,26 @@
 
 namespace Lockw1nLabs\PayoneApiClient\Request;
 
+use Lockw1nLabs\PayoneApiClient\Dto\HostedCheckoutRequestDataTransfer;
 use Lockw1nLabs\PayoneApiClient\PayoneApiClientConstants;
 use Lockw1nLabs\PayoneApiClient\Request\Builder\RequestBuilder;
+use Lockw1nLabs\PayoneApiClient\Request\Validator\HostedCheckoutRequestValidator;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HostedCheckoutRequest
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-        private readonly RequestBuilder $requestBuilder
+        private readonly RequestBuilder $requestBuilder,
+        private readonly HostedCheckoutRequestValidator $hostedCheckoutRequestValidator
     ) {}
 
-    public function createHostedCheckout(string $merchantId, array $requestData)
-    {
+    public function createHostedCheckout(
+        string $merchantId,
+        HostedCheckoutRequestDataTransfer $hostedCheckoutRequest
+    ) {
+        $this->hostedCheckoutRequestValidator->validate($hostedCheckoutRequest);
+
         $response = $this->httpClient->request(
             PayoneApiClientConstants::HTTP_METHOD_POST,
             $this->requestBuilder
@@ -27,7 +34,7 @@ class HostedCheckoutRequest
                     $merchantId,
                     PayoneApiClientConstants::PAYONE_API_ENDPOINT_HOSTED_CHECKOUT
                 ),
-            ['json' => $this->requestBuilder->buildRequestParams($requestData)]
+            ['json' => $hostedCheckoutRequest->serialize()]
         );
 
         $headers = $response->getHeaders();

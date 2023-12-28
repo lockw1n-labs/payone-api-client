@@ -13,7 +13,6 @@ class AbstractDataTransfer implements Serializable
 {
     public function __construct(protected $properties = []) {}
 
-
     /**
      * @return string|null
      */
@@ -58,6 +57,24 @@ class AbstractDataTransfer implements Serializable
     {
         foreach ($data as $property => $value) {
             $this->$property = $value;
+        }
+    }
+
+    /**
+     * @param string $property
+     *
+     * @throws \Exception
+     *
+     * @return void
+     */
+    protected function assertPropertyIsSet(string $property): void
+    {
+        if ($this->$property === null) {
+            throw new \Exception(sprintf(
+                'Missing required property "%s" for %s.',
+                $property,
+                static::class,
+            ));
         }
     }
 }

@@ -7,6 +7,6 @@
 
 namespace Lockw1nLabs\PayoneApiClient\Dto;
 
-class RequestDataTransfer extends AbstractDataTransfer
+class CustomerDataTransfer extends AbstractDataTransfer
 {
 }
