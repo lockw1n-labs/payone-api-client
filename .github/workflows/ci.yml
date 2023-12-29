@@ -10,7 +10,6 @@ on:
 jobs:
     ci:
         name: Payone (PHP ${{ matrix.php-versions }})
-        needs: setup
         runs-on: ubuntu-22.04
 
         strategy:
