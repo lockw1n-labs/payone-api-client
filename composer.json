@@ -4,7 +4,7 @@
     "description": "PSP Payone API Client.",
     "license": "MIT",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "symfony/http-client": "^v7.0.0"
     },
     "require-dev": {
