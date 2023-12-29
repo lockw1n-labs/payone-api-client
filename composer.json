@@ -17,6 +17,10 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "scripts": {
+        "stan": "vendor/bin/phpstan analyse src/",
+        "test": "vendor/bin/codecept run --quiet --fail-fast --no-exit"
+    },
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
