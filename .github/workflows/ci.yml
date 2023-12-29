@@ -1,0 +1,57 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - 'main'
+    workflow_dispatch:
+
+jobs:
+    ci:
+        name: Payone (PHP ${{ matrix.php-versions }})
+        runs-on: ubuntu-22.04
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions:
+                    - '8.2'
+
+        steps:
+            -   name: Checkout@v2
+                uses: actions/checkout@v2
+
+            -   name: Setup PHP ${{ matrix.php-versions }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-versions }}
+                    extensions: mbstring, intl, bcmath
+
+            -   name: Get composer cache directory
+                id: composer-cache
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+            -   uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: ${{ runner.os }}-${{ matrix.php-versions }}-composer-
+
+            -   name: Composer validate
+                run: composer validate
+
+            -   name: Composer version
+                run: composer --version
+
+            -   name: Composer install
+                run: composer install --prefer-dist --no-interaction --optimize-autoloader
+
+            -   name: PHP syntax validation
+                run: find ./src -path src -prune -o -type f -name '*.php' -print0 | xargs -0 -n1 -P4 php -l -n | (! grep -v "No syntax errors detected" )
+
+            -   name: Run codeception tests
+                run: composer test
+
+            -   name: Run PHPStan checks
+                run: composer stan
